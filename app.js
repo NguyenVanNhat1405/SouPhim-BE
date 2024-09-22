@@ -22,7 +22,7 @@ app.use(express.json());
 // Đăng ký các routes
 app.use('/api/auth', authRoutes);
 app.use('/api/favorites', favoriteRoutes);
-
+app.use('/api/movies', movieRoutes);
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Souphim' });
 });

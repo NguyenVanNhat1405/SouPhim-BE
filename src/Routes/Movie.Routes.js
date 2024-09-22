@@ -1,25 +1,11 @@
-// movieRoutes.js
 const express = require('express');
-const axios = require('axios');
-require('dotenv').config();
+const movieController = require('../Controllers/movie.controller'); // Đảm bảo đường dẫn đúng đến controller
 const router = express.Router();
 
-const API_KEY = process.env.MOVIE_DB_API_KEY;
-const BASE_URL = 'https://api.themoviedb.org/3';
+// Route để lấy tất cả phim
+router.get('/', movieController.getAllMovies); // Route này sẽ gọi phương thức getAllMovies
 
-router.get('/movie/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const response = await axios.get(`${BASE_URL}/movie/${id}?api_key=${API_KEY}`);
-    res.json(response.data);
-  } catch (error) {
-    console.error('Error fetching movie data:', error.message);
-    console.error('Error details:', error.response ? error.response.data : 'No response data');
-    res.status(error.response?.status || 500).json({
-      error: 'Failed to fetch movie data',
-      message: error.response?.data?.status_message || error.message
-    });
-  }
-});
+// Route để lấy thông tin phim và diễn viên theo ID phim
+router.get('/:movieId', movieController.getMovie); // Route này sẽ gọi phương thức getMovie với movieId
 
-module.exports = router;
+module.exports = router; // Xuất router để sử dụng trong app chính
