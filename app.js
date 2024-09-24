@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./src/Routes/User.routes');
 const favoriteRoutes = require('./src/Routes/favorite.routes'); // Import routes yêu thích
 const movieRoutes = require('./src/Routes/Movie.Routes');
+const movieNewRoutes = require('./src/Routes/MovieNew.routes');
+const moviePopuRoutes = require('./src/Routes/MoviePopu.routes');
+
 require('dotenv').config();
 
 const app = express();
@@ -23,6 +26,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/movies', movieRoutes);
+app.use('/api/new', movieNewRoutes);
+app.use('/api/popular', moviePopuRoutes); 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Souphim' });
 });

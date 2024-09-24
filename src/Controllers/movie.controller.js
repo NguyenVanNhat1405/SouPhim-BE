@@ -1,16 +1,24 @@
 const axios = require('axios');
 const Movie = require('../Models/movie.model');
-
 const omdbApiKey = process.env.OMDB_API_KEY; // API key cho OMDb
 const youtubeApiKey = process.env.YOUTUBE_API_KEY; // API key cho YouTube
-const baseUrl = 'http://www.omdbapi.com'; // URL của OMDb
-const youtubeSearchUrl = 'https://www.googleapis.com/youtube/v3/search'; // URL cho YouTube search API
+const omdbBaseUrl = 'http://www.omdbapi.com';
 
-// Hàm tìm kiếm trailer trên YouTube
+// Hàm lấy thông tin phim từ OMDb dựa trên IMDb ID
+async function fetchMovieDetailsFromOMDb(imdbID) {
+    const response = await axios.get(`${omdbBaseUrl}`, {
+        params: {
+            i: imdbID,
+            apikey: omdbApiKey
+        }
+    });
+    return response.data;
+}
+
+// Hàm tìm trailer trên YouTube
 async function getTrailerFromYouTube(movieTitle) {
     try {
-        // Tìm kiếm trailer phim trên YouTube dựa vào tên phim
-        const response = await axios.get(youtubeSearchUrl, {
+        const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
             params: {
                 part: 'snippet',
                 q: `${movieTitle} trailer`,
@@ -19,60 +27,54 @@ async function getTrailerFromYouTube(movieTitle) {
                 maxResults: 1
             }
         });
-
         const videos = response.data.items;
-        if (videos && videos.length > 0) {
-            const trailer = videos[0];
-            return `https://www.youtube.com/watch?v=${trailer.id.videoId}`;
-        } else {
-            console.log('No trailers found for this movie on YouTube.');
-            return null;
-        }
+        return videos.length > 0 ? `https://www.youtube.com/watch?v=${videos[0].id.videoId}` : null;
     } catch (error) {
         console.error('Error fetching trailer from YouTube:', error);
         return null;
     }
 }
 
+// Hàm lưu phim vào MongoDB
+async function saveMovie(movieData, trailer, MovieModel) {
+    const movie = new MovieModel({
+        id: movieData.imdbID,
+        title: movieData.Title,
+        poster: movieData.Poster,
+        countries: movieData.Country ? movieData.Country.split(', ') : [],
+        release_date: movieData.Released,
+        overview: movieData.Plot,
+        genres: movieData.Genre ? movieData.Genre.split(', ') : [],
+        director: movieData.Director,
+        runtime: movieData.Runtime,
+        actors: movieData.Actors ? movieData.Actors.split(', ') : [],
+        trailer: trailer
+    });
+    await movie.save();
+}
+
+// Hàm lấy thông tin phim cụ thể từ OMDb và TMDb
 async function getMovie(req, res) {
-    const movieId = req.params.movieId; // IMDb ID
+    const movieId = req.params.movieId; // IMDb ID hoặc TMDb ID
 
     try {
         // Kiểm tra xem phim đã tồn tại trong MongoDB chưa
         let movie = await Movie.findOne({ id: movieId });
         if (!movie) {
             // Fetch movie details từ OMDb
-            const movieResponse = await axios.get(`${baseUrl}`, {
-                params: {
-                    i: movieId,
-                    apikey: omdbApiKey
-                }
-            });
+            const movieResponse = await fetchMovieDetailsFromOMDb(movieId);
 
             // Kiểm tra xem có dữ liệu phim hay không
-            if (movieResponse.data.Response === "False") {
-                return res.status(404).json({ message: movieResponse.data.Error });
+            if (movieResponse.Response === "False") {
+                return res.status(404).json({ message: movieResponse.Error });
             }
 
             // Lấy trailer từ YouTube
-            const trailer = await getTrailerFromYouTube(movieResponse.data.Title);
+            const trailer = await getTrailerFromYouTube(movieResponse.Title);
 
-            // Lưu thông tin phim vào MongoDB
-            movie = new Movie({
-                id: movieResponse.data.imdbID, // IMDb ID
-                title: movieResponse.data.Title,
-                poster: movieResponse.data.Poster,
-                countries: movieResponse.data.Country.split(', '), // Tách danh sách quốc gia
-                release_date: movieResponse.data.Released,
-                overview: movieResponse.data.Plot,
-                genres: movieResponse.data.Genre.split(', '), // Tách thể loại
-                director: movieResponse.data.Director, // Đạo diễn
-                runtime: movieResponse.data.Runtime,
-                actors: movieResponse.data.Actors.split(', '), // Tách danh sách diễn viên
-                trailer: trailer // Lưu trailer từ YouTube
-            });
-
-            await movie.save(); // Lưu phim vào MongoDB
+            // Lưu phim vào MongoDB
+            await saveMovie(movieResponse, trailer, Movie);
+            movie = await Movie.findOne({ id: movieId }); // Lấy lại phim đã lưu
         }
 
         // Trả về dữ liệu phim
@@ -83,7 +85,7 @@ async function getMovie(req, res) {
     }
 }
 
-// Hàm lấy tất cả phim
+// Hàm lấy tất cả phim từ MongoDB
 async function getAllMovies(req, res) {
     try {
         const movies = await Movie.find(); // Lấy tất cả phim từ MongoDB
