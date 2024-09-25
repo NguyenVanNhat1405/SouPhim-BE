@@ -6,6 +6,7 @@ const favoriteRoutes = require('./src/Routes/favorite.routes'); // Import routes
 const movieRoutes = require('./src/Routes/Movie.Routes');
 const movieNewRoutes = require('./src/Routes/MovieNew.routes');
 const moviePopuRoutes = require('./src/Routes/MoviePopu.routes');
+const commentRoutes = require('./src/Routes/Comment.routes');
 
 require('dotenv').config();
 
@@ -28,6 +29,7 @@ app.use('/api/favorites', favoriteRoutes);
 app.use('/api/movies', movieRoutes);
 app.use('/api/new', movieNewRoutes);
 app.use('/api/popular', moviePopuRoutes); 
+app.use('/api', commentRoutes);
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Souphim' });
 });

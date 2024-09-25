@@ -6,6 +6,7 @@ const omdbBaseUrl = 'http://www.omdbapi.com';
 
 // Hàm lấy thông tin phim từ OMDb dựa trên IMDb ID
 async function fetchMovieDetailsFromOMDb(imdbID) {
+    console.log('Fetching movie details for IMDb ID:', imdbID);
     const response = await axios.get(`${omdbBaseUrl}`, {
         params: {
             i: imdbID,
@@ -95,8 +96,33 @@ async function getAllMovies(req, res) {
         res.status(500).json({ message: error.message });
     }
 }
+const searchMovies = async (req, res) => {
+    const query = req.query.query;
+    console.log('Search Query:', query); // Log truy vấn tìm kiếm
+
+    try {
+        const movies = await Movie.find({
+            $or: [
+                { title: { $regex: query, $options: 'i' } }, // Tìm theo tiêu đề
+                { actors: { $regex: query, $options: 'i' } } // Tìm theo diễn viên
+            ]
+        });
+
+        // Kiểm tra nếu không tìm thấy phim nào
+        if (movies.length === 0) {
+            return res.status(404).json({ message: 'No movies found' });
+        }
+
+        res.json(movies);
+    } catch (error) {
+        console.error('Error searching movies:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 module.exports = {
     getMovie,
-    getAllMovies
+    getAllMovies,
+    searchMovies
 };
