@@ -9,9 +9,15 @@ const moviePopuSchema = new mongoose.Schema({
     overview: { type: String },
     genres: [String], // Thể loại phim
     director: { type: String }, // Đạo diễn
-    runtime: { type: String },
+    runtime: { type: String }, //
     actors: [String], // Đổi thành mảng để lưu danh sách diễn viên
     trailer: { type: String }, // Thêm trường cho trailer
+    writer:  [String ], //
+    production_companies: [String],
+    award: [String ],
+    seasons: {type: Number },
+    episodes: { type: Number },   // Thêm trường cho trailer
+    imdbRating:{type:Number}
 });
 
 const MoviePopu = mongoose.model('MoviePopu', moviePopuSchema);

@@ -9,9 +9,15 @@ const movieSchema = new mongoose.Schema({
     overview: { type: String },
     genres: [String], // Thể loại phim
     director: { type: String }, // Đạo diễn
-    runtime: { type: String },
+    runtime: { type: String }, //
     actors: [String], // Đổi thành mảng để lưu danh sách diễn viên
     trailer: { type: String }, // Thêm trường cho trailer
+    writer: [String ], //
+    production_companies: [String],
+    award: [String ],
+    seasons: {type: Number },
+    episodes: { type: Number },   
+    imdbRating:{type:Number}
 });
 
 const Movie = mongoose.model('Movie', movieSchema);
