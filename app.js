@@ -7,7 +7,8 @@ const movieRoutes = require('./src/Routes/Movie.Routes');
 const movieNewRoutes = require('./src/Routes/MovieNew.routes');
 const moviePopuRoutes = require('./src/Routes/MoviePopu.routes');
 const commentRoutes = require('./src/Routes/Comment.routes');
-const ratingRoutes = require('./src/Routes/rating.routes');
+const ratingRoutes = require('./src/Routes/Rating.routes');
+const historyRoutes = require('./src/Routes/History.routes');
 require('dotenv').config();
 
 const app = express();
@@ -31,6 +32,7 @@ app.use('/api/new', movieNewRoutes);
 app.use('/api/popular', moviePopuRoutes); 
 app.use('/api', commentRoutes);
 app.use('/api/ratings', ratingRoutes);
+app.use('/api/history', historyRoutes);
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Souphim' });
 });

@@ -78,3 +78,28 @@ exports.login = async (req, res) => {
   }
 };
 
+// Cập nhật thông tin người dùng
+exports.update = async (req, res) => {
+  const { username, email } = req.body;
+  const userId = req.user.user.id; // Lấy userId từ token đã giải mã
+
+  try {
+    let user = await User.findById(userId); // Tìm người dùng theo ID
+
+    if (!user) {
+      return res.status(404).json({ msg: 'Người dùng không tồn tại' });
+    }
+
+    // Cập nhật thông tin
+    if (username) user.username = username;
+    if (email) user.email = email;
+
+    await user.save();
+
+    res.json({ msg: 'Thông tin người dùng đã được cập nhật', user });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ msg: 'Lỗi server' });
+  }
+};
+

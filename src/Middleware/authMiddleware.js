@@ -9,7 +9,7 @@ const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Đảm bảo req.user được thiết lập đúng
+    req.user = decoded ; // Đảm bảo req.user được thiết lập đúng
     next();
   } catch (err) {
     return res.status(401).json({ error: 'Unauthorized' });

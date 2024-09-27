@@ -18,7 +18,7 @@ async function saveMovieToAllCollections(movieData, trailer, MovieModel) {
         award: movieData.Awards && movieData.Awards !== "N/A" ? movieData.Awards.split(', ') : [],
         writer: movieData.Writer !== "N/A" ? movieData.Writer.split(', ') : ["Chưa có thông tin"], // Xử lý writer
         seasons: movieData.Type === 'series' && movieData.totalSeasons !== "N/A" ? movieData.totalSeasons : null,
-        imdbRating: movieData.imdbRating,
+        imdbRating: movieData.imdbRating ? movieData.imdbRating : null,
     });
 
     // Lưu vào model cụ thể nếu chưa tồn tại
@@ -46,7 +46,7 @@ async function saveMovieToAllCollections(movieData, trailer, MovieModel) {
             award: movieData.Awards && movieData.Awards !== "N/A" ? movieData.Awards.split(', ') : [],
             writer: movieData.Writer !== "N/A" ? movieData.Writer.split(', ') : ["Chưa có thông tin"], // Xử lý writer
             seasons: movieData.Type === 'series' && movieData.totalSeasons !== "N/A" ? movieData.totalSeasons : null,
-            imdbRating: movieData.imdbRating,
+            imdbRating: movieData.imdbRating ? movieData.imdbRating : null,
         });
         await mainMovie.save();
     }

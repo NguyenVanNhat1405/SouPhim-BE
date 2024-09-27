@@ -17,7 +17,7 @@ const movieNewSchema = new mongoose.Schema({
     award: [String ],
     seasons: {type: Number },
     episodes: { type: Number },   // Thêm trường cho trailer
-    imdbRating:{type: Number}, // Thêm tr
+    imdbRating:{type: String}, // Thêm tr
 });
 
 const MovieNew = mongoose.model('MovieNew', movieNewSchema);

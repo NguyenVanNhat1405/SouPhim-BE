@@ -10,5 +10,5 @@ router.get('/get', movieController.getAllMovies); // Route này sẽ gọi phư�
 router.get('/add/:movieId', movieController.getMovie); // Route này sẽ gọi phương thức getMovie với movieId
 router.get('/search', movieController.searchMovies);
 // Route để lấy phim phổ biến
-
+router.get('/recommendations/:movieId', movieController.getRecommendations);
 module.exports = router; // Xuất router để sử dụng trong app chính

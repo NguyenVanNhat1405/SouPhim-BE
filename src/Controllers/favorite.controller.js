@@ -16,7 +16,7 @@ const getFavorites = async (req, res) => {
 const addFavorite = async (req, res) => {
   const { itemId, name, imageUrl } = req.body;
   const userId = req.user.user.id; // Lấy userId từ req.user.user
-
+  console.log('Dữ liệu từ request:', { itemId, name, imageUrl, userId });
   if (!userId) {
     return res.status(400).json({ error: 'User ID is required' });
   }

@@ -17,9 +17,8 @@ const movieSchema = new mongoose.Schema({
     award: [String ],
     seasons: {type: Number },
     episodes: { type: Number },   
-    imdbRating:{type:Number}
+    imdbRating:{type:String}
 });
-
 const Movie = mongoose.model('Movie', movieSchema);
 
 module.exports = Movie;

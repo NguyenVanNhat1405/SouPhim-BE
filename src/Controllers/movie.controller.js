@@ -54,7 +54,7 @@ async function saveMovie(movieData, trailer, MovieModel) {
         award: movieData.Awards && movieData.Awards !== "N/A" ? movieData.Awards.split(', ') : [],
         writer: movieData.Writer !== "N/A" ? movieData.Writer.split(', ') : ["Chưa có thông tin"], // Xử lý writer
         seasons: movieData.Type === 'series' && movieData.totalSeasons !== "N/A" ? movieData.totalSeasons : null,
-        imdbRating: movieData.imdbRating,
+        imdbRating: movieData.imdbRating ? movieData.imdbRating : null,
     });
     await movie.save();
 }
@@ -126,9 +126,36 @@ const searchMovies = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+const getRecommendations = async (req, res) => {
+    const { movieId } = req.params;
+  
+    try {
+        // Lấy phim hiện tại dựa trên ID
+        const currentMovie = await Movie.findOne({ id: movieId });
+        if (!currentMovie) {
+            return res.status(404).json({ message: 'Phim không tìm thấy' });
+        }
+
+        // Tìm phim có cùng thể loại nhưng loại trừ phim hiện tại
+        const recommendations = await Movie.find({
+            genres: { $in: currentMovie.genres },  // Phim có cùng thể loại
+            id: { $ne: movieId }  // Loại trừ phim hiện tại
+        }).limit(5);  // Giới hạn số lượng phim gợi ý
+
+        if (recommendations.length === 0) {
+            return res.status(404).json({ message: 'Không có gợi ý phù hợp' });
+        }
+
+        res.json(recommendations);
+    } catch (error) {
+        console.error('Lỗi khi lấy gợi ý phim:', error);
+        res.status(500).json({ error: 'Lỗi khi lấy gợi ý phim' });
+    }
+};
 
 module.exports = {
     getMovie,
     getAllMovies,
-    searchMovies
+    searchMovies,
+    getRecommendations
 };
