@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
 
-const FavoriteSchema = new mongoose.Schema({
+const watchHistorySchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, required: true },
   movieId: { type: String, required: true },
   name: { type: String, required: true },
   imageUrl: { type: String },
-}, { timestamps: true });
+  watchedAt: { type: Date, default: Date.now }
+});
 
-module.exports = mongoose.model('Favorite', FavoriteSchema);
+const WatchHistory = mongoose.model('WatchHistory', watchHistorySchema);
+module.exports = WatchHistory;

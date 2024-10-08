@@ -1,6 +1,6 @@
 const Favorite = require('../Models/Favorite.model');
-require('dotenv').config();
 
+require('dotenv').config();
 const getFavorites = async (req, res) => {
   try {
     const favorites = await Favorite.find({ userId: req.user.user.id });
@@ -14,19 +14,19 @@ const getFavorites = async (req, res) => {
 };
 
 const addFavorite = async (req, res) => {
-  const { itemId, name, imageUrl } = req.body;
+  const { movieId, name, imageUrl } = req.body;
   const userId = req.user.user.id; // Lấy userId từ req.user.user
-  console.log('Dữ liệu từ request:', { itemId, name, imageUrl, userId });
+  // console.log('Dữ liệu từ request:', { movieId, name, imageUrl, userId });
   if (!userId) {
     return res.status(400).json({ error: 'User ID is required' });
   }
 
-  if (!itemId) {
-    return res.status(400).json({ error: 'Item ID is required' });
+  if (!movieId) {
+    return res.status(400).json({ error: 'movie ID is required' });
   }
 
   try {
-    const newFavorite = new Favorite({ userId, itemId, name, imageUrl });
+    const newFavorite = new Favorite({ userId, movieId, name, imageUrl });
     await newFavorite.save();
     res.status(201).json(newFavorite);
   } catch (error) {
@@ -36,10 +36,10 @@ const addFavorite = async (req, res) => {
 };
 
 const removeFavorite = async (req, res) => {
-  const { itemId } = req.params;
+  const { movieId } = req.params;
 
   try {
-    const favorite = await Favorite.findOneAndDelete({ userId: req.user.user.id, itemId });
+    const favorite = await Favorite.findOneAndDelete({ userId: req.user.user.id, movieId });
     if (!favorite) {
       return res.status(404).json({ message: 'Favorite not found' });
     }

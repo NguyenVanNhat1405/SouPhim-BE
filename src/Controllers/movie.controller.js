@@ -109,9 +109,9 @@ const searchMovies = async (req, res) => {
 
     try {
         const movies = await Movie.find({
-            $or: [
+            $and: [
                 { title: { $regex: query, $options: 'i' } }, // Tìm theo tiêu đề
-                { actors: { $regex: query, $options: 'i' } } // Tìm theo diễn viên
+                { countries: { $regex: query, $options: 'i' } } // Tìm theo diễn viên
             ]
         });
 
@@ -152,10 +152,50 @@ const getRecommendations = async (req, res) => {
         res.status(500).json({ error: 'Lỗi khi lấy gợi ý phim' });
     }
 };
+const deleteMovie = async (req, res) => {
+    const movieId = req.params.movieId; // Lấy ID của phim từ tham số
+
+    try {
+        // Tìm và xóa phim dựa trên ID
+        const result = await Movie.findOneAndDelete({ id: movieId });
+
+        if (!result) {
+            return res.status(404).json({ message: 'Phim không tìm thấy' });
+        }
+
+        res.json({ message: 'Phim đã được xóa thành công' });
+    } catch (error) {
+        console.error('Lỗi khi xóa phim:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Hàm lấy thông tin phim cụ thể từ MongoDB dựa trên movieId
+const getOneMovie = async (req, res) => {
+    const movieId = req.params.movieId; // Lấy movieId từ URL
+
+    try {
+        // Tìm phim trong MongoDB theo id (IMDb ID)
+        const movie = await Movie.findOne({ id: movieId });
+
+        // Kiểm tra nếu phim không tồn tại
+        if (!movie) {
+            return res.status(404).json({ message: 'Phim không tìm thấy' });
+        }
+
+        // Trả về dữ liệu phim
+        res.json(movie);
+    } catch (error) {
+        console.error('Error fetching movie:', error);
+        res.status(500).json({ message: error.message });
+    }
+}
 
 module.exports = {
     getMovie,
     getAllMovies,
     searchMovies,
-    getRecommendations
+    getRecommendations,
+    deleteMovie,
+    getOneMovie
 };
